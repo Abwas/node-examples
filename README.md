@@ -28,10 +28,7 @@ _______
 3. npm install
 4. npm start
 
-_______
-
-
-#### How to install Mand run MongoDB with the Node-Express-Gen Folder above:
+** How to install Mand run MongoDB with the Node-Express-Gen Folder above:**
 * Go to http://www.mongodb.org, then download and install MongoDB as per the instructions given there.
 * Create a folder named mongodb on your computer and create a subfolder under it named data.
 * Move to the mongodb folder and then start the MongoDB server by typing the following at the prompt: ```mongod --dbpath=data```
@@ -47,3 +44,13 @@ _______
 * Next, we will learn the information encoded into the ObjectId by typing the following at the prompt: 
 ``` var id = new ObjectId();
      id.getTimestamp(); ```
+
+
+#### Node-mongodb [folder]
+* simpleserver.js
+* Utilize the node MongoDB driver module and configure node application to communicate with the MongoDB server. 
+
+** How to Use it**
+* ```npm install```
+* navigate to mongodb folder and run ```mongod --dbpath=data```
+* navigate to node-mongodb folder and run ```node simpleserver```
