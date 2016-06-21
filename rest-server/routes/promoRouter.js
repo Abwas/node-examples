@@ -1,37 +1,61 @@
 var express = require('express'),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    mongoose = require('mongoose');
+
+var Promos = require('../models/promotions');
 
 var promoRouter = express.Router();
 promoRouter.use(bodyParser.json());
+
 promoRouter.route('/')
-.all(function(req,res,next) {
-    res.writeHead(200, { 'Content-Type': 'text/plain'});
-    next();
-})
+
 .get(function(req,res,next) {
-    res.end('Code here will send all the promotions to you!');
+    Promos.find({}, function (err,promo) {
+        if (err) throw err;
+        res.json(promo);
+    });
 })
 .post(function(req,res,next) {
-    res.end('Code here will add the promotions ' + req.body.name + ' with details: ' + req.body.description);
+    Promos.create(req.body, function(err,promo) {
+        if (err) throw err;
+        console.log('Promotion Created');
+        var id = promo._id;
+        res.writeHead(200, {
+            'Content-Type': 'text/plain'
+        });
+        res.end('Added the promotion with id: ' + id);
+    });
 })
 .delete(function(req,res,next) {
-    res.end('Code here will delete all promotions');
+    Promos.remove({}, function(err,resp) {
+        if (err) throw err;
+        res.json(resp);
+    });
 });
 
 promoRouter.route('/:promoId')
-.all(function(req,res,next) {
-    res.writeHead(200, { 'Content-Type': 'text/plain'});
-    next();
-})
+
 .get(function(req,res,next) {
-    res.end('Code here will send details of the promotion: ' + req.params.promoId + ' to you!');
+    Promos.findById(req.params.promoId, function(err, promo) {
+        if (err) throw err;
+        res.json(promo);
+    });
 })
 .put(function(req,res,next) {
-    res.write('Code here updating the promotion: ' + req.params.promoId + '\n');
-    res.end('Code here will update the promotion: ' + req.body.name + ' with details: ' + req.body.description);
+    Promos.findByIdAndUpdate(req.params.promoId, {
+        $set: req.body
+    }, {
+        new: true
+    }, function (err, promo) {
+        if (err) throw err;
+        res.json(promo);
+    });
 })
 .delete(function(req,res,next) {
-    res.end('Code here deleting promotion: ' + req.params.promoId);
+    Promos.findByIdAndRemove(req.params.promoId, function (err, resp) {
+        if (err) throw err;
+        res.json(resp);
+    });
 });
 
 module.exports = promoRouter;
