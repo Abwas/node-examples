@@ -54,3 +54,19 @@ _______
 * ```npm install```
 * navigate to mongodb folder and run ```mongod --dbpath=data```
 * navigate to node-mongodb folder and run ```node simpleserver```
+
+--------
+#### Rest-Server [folder]
+**This folder is the production folder and puts all of our learning together**
+* Integrated the REST API server based on the Express framework that we implemented earlier, together with the Mongoose schema and models that we developed to create a full-fledged REST API server
+* To build this we started by scaffolding out an Express application using ```express rest-server```
+* We then added in our ```app.js``` file from the node-express-gen folder.
+* We then added in our routes from node-express-gen: ```dishRouter.js promoRouter.js leaderRouter.js```
+* We then copied in our models
+* Then ran ```npm install``` and ```npm install mongoose mongoose-currency --save``` to add them to our dependency list.
+* After wiring it all together with some code changes, we are good to go!
+
+**To run**
+* navigate to your database: ```mongod --dbpath=data```
+* navigate to rest-server: ```npm-start```
+* Open postman and run your post/get/put/delete requests to test
