@@ -24,7 +24,7 @@ dishRouter.route('/')
     });
 })
 
-.post(Verify.verifyOrdinaryUser, function (req, res, next) {
+.post(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     //remember, req.body has already been passed by the body parser and converted into the appropriate json
     Dishes.create(req.body, function (err, dish) {
         if (err) throw err;
@@ -39,7 +39,7 @@ dishRouter.route('/')
     });
 })
 //delete dishes in the collection
-.delete(Verify.verifyOrdinaryUser, function (req, res, next) {
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     //empty object as first parameter to delete all dishes
     Dishes.remove({}, function (err, resp) {
         if (err) throw err;
@@ -49,14 +49,14 @@ dishRouter.route('/')
 
 //handling specific dishes
 dishRouter.route('/:dishId')
-.get(function (req, res, next) {
+.get(Verify.verifyOrdinaryUser, function (req, res, next) {
     //req.params.dishId holds the dish id
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
         res.json(dish);
     });
 })
-.put(function (req, res, next) {
+.put(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     Dishes.findByIdAndUpdate(req.params.dishId, {
         //expectation is that the body of incoming message should contain updates in json format
         $set: req.body
@@ -70,7 +70,7 @@ dishRouter.route('/:dishId')
     });
 })
 
-.delete(function (req, res, next) {
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     Dishes.findByIdAndRemove(req.params.dishId, function (err, resp) {
         if (err) throw err;
         res.json(resp);
@@ -80,14 +80,14 @@ dishRouter.route('/:dishId')
 //NOW WE HANDLE THE COMMENTS
 //Each dish has its own specific comments
 dishRouter.route('/:dishId/comments')
-.get(function (req, res, next) {
+.get(Verify.verifyOrdinaryUser, function (req, res, next) {
     //return all comments for a dish in an array
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
         res.json(dish.comments); //dish.comments already points to the array of all the comments so we just return that in json format
     });
 })
-.post(function (req, res, next) {
+.post(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     //first, retrieve the dish we want to add comments to
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
@@ -103,7 +103,7 @@ dishRouter.route('/:dishId/comments')
     });
 })
 
-.delete(function (req, res, next) {
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     //delete all the comments for one dish
     //first, we find the dish with findbyid
     Dishes.findById(req.params.dishId, function (err, dish) {
@@ -126,7 +126,7 @@ dishRouter.route('/:dishId/comments')
 });
 
 dishRouter.route('/:dishId/comments/:commentId')
-.get(function (req, res, next) {
+.get(Verify.verifyOrdinaryUser, function (req, res, next) {
     //first retrieve the correct dish
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
@@ -135,7 +135,7 @@ dishRouter.route('/:dishId/comments/:commentId')
     });
 })
 
-.put(function (req, res, next) {
+.put(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     //support for put in embedded documents is not as straight forward
     //entire updated comment must be sent. We then delete the old comment, and insert the update as an entirely new comment
     Dishes.findById(req.params.dishId, function (err, dish) {
@@ -150,7 +150,7 @@ dishRouter.route('/:dishId/comments/:commentId')
     });
 })
 
-.delete(function (req, res, next) {
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     Dishes.findById(req.params.dishId, function (err, dish) {
         dish.comments.id(req.params.commentId).remove();
         dish.save(function (err, resp) {

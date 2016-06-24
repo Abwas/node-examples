@@ -6,8 +6,15 @@ var User = require('../models/user');
 var Verify = require('./verify');
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+    //find operation on Users with empty object (which returns all users in the collection as array)
+    User.find({}, function (err, user) {
+        //if error, end.
+        if (err) throw err;
+        //res.json is method that converts the object to a json string and sends it to the server
+        //header set to 200 and content-type is set automatically
+        res.json(user);
+    });
 });
 
 //to register, the user sends a post to '/users/register'
