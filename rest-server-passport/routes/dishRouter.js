@@ -15,7 +15,10 @@ dishRouter.route('/')
 //when we receive a request for 'get' on '/'
 .get(Verify.verifyOrdinaryUser, function (req, res, next) {
     //find operation on Dishes with empty object (which returns all items in Dishes collection as array)
-    Dishes.find({}, function (err, dish) {
+    Dishes.find({})
+        //populate the dishes with the comment information
+        .populate('comments.postedBy')
+        .exec(function (err,dish){
         //if error, end.
         if (err) throw err;
         //res.json is method that converts the object to a json string and sends it to the server
@@ -51,7 +54,9 @@ dishRouter.route('/')
 dishRouter.route('/:dishId')
 .get(Verify.verifyOrdinaryUser, function (req, res, next) {
     //req.params.dishId holds the dish id
-    Dishes.findById(req.params.dishId, function (err, dish) {
+    Dishes.findById(req.params.dishId)
+        .populate('comments.postedBy') //add in details of comments
+        .exec(function (err, dish) {
         if (err) throw err;
         res.json(dish);
     });
@@ -80,17 +85,22 @@ dishRouter.route('/:dishId')
 //NOW WE HANDLE THE COMMENTS
 //Each dish has its own specific comments
 dishRouter.route('/:dishId/comments')
-.get(Verify.verifyOrdinaryUser, function (req, res, next) {
+.all(Verify.verifyOrdinaryUser)
+.get(function (req, res, next) {
     //return all comments for a dish in an array
-    Dishes.findById(req.params.dishId, function (err, dish) {
+    Dishes.findById(req.params.dishId)
+        .populate('comments.postedBy')
+        .exec(function (err, dish) {
         if (err) throw err;
         res.json(dish.comments); //dish.comments already points to the array of all the comments so we just return that in json format
     });
 })
-.post(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+.post(function (req, res, next) {
     //first, retrieve the dish we want to add comments to
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
+        //records the id of the user into the postedBy property (so we know who is making a comment)
+        req.body.postedBy = req.decoded._doc._id;
         //then push the incoming comment (req.body) into the dish.comments array
         dish.comments.push(req.body);
         //then we save the new array
@@ -103,7 +113,7 @@ dishRouter.route('/:dishId/comments')
     });
 })
 
-.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+.delete(Verify.verifyAdmin, function (req, res, next) {
     //delete all the comments for one dish
     //first, we find the dish with findbyid
     Dishes.findById(req.params.dishId, function (err, dish) {
@@ -126,21 +136,25 @@ dishRouter.route('/:dishId/comments')
 });
 
 dishRouter.route('/:dishId/comments/:commentId')
-.get(Verify.verifyOrdinaryUser, function (req, res, next) {
+.all(Verify.verifyOrdinaryUser)
+.get(function (req, res, next) {
     //first retrieve the correct dish
-    Dishes.findById(req.params.dishId, function (err, dish) {
+    Dishes.findById(req.params.dishId)
+        .populate('comments.postedBy')
+        .exec(function (err, dish) {
         if (err) throw err;
         //then return the exact comment from the array of comments
         res.json(dish.comments.id(req.params.commentId));
     });
 })
 
-.put(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+.put(function (req, res, next) {
     //support for put in embedded documents is not as straight forward
     //entire updated comment must be sent. We then delete the old comment, and insert the update as an entirely new comment
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
         dish.comments.id(req.params.commentId).remove();
+        req.body.postedBy = req.decoded._doc._id;
         dish.comments.push(req.body);
         dish.save(function (err, dish) {
             if (err) throw err;
@@ -150,8 +164,15 @@ dishRouter.route('/:dishId/comments/:commentId')
     });
 })
 
-.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+.delete(function (req, res, next) {
     Dishes.findById(req.params.dishId, function (err, dish) {
+        //check to see if the user that is deleting the comment is the same user that created the comment
+        if(dish.comments.id(req.params.commentId).postedBy != req.decoded._doc._id) {
+            var error = new Error('You are not authorized to perform this operation');
+            err.status = 403;
+            return next(err);
+        }
+        
         dish.comments.id(req.params.commentId).remove();
         dish.save(function (err, resp) {
             if (err) throw err;

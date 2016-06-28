@@ -4,6 +4,8 @@ var express = require('express'),
 
 var Promos = require('../models/promotions');
 
+var Verify = require('./verify');
+
 var promoRouter = express.Router();
 promoRouter.use(bodyParser.json());
 

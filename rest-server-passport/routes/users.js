@@ -26,10 +26,20 @@ router.post('/register', function(req,res) {
         if (err) {
             return res.status(500).json({err:err});
         }
+        //if first and last name are available, set them.
+        if (req.body.firstname) {
+            user.firstname = req.body.firstname;
+        }
+        if (req.body.lastname) {
+            user.lastname = req.body.lastname;
+        }
+        //save user
+        user.save(function(err,user) {
         //crosscheck to make sure registration was successful
         //then have callback send 200 status code and registration successful
-        passport.authenticate('local')(req,res,function() {
-            return res.status(200).json({ status: 'Registration Successful'});
+            passport.authenticate('local')(req,res,function() {
+                return res.status(200).json({ status: 'Registration Successful'});
+            });
         });
     });
 });

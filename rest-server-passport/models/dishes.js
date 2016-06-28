@@ -18,9 +18,11 @@ var commentSchema = new Schema({
         type: String,
         required: true
     },
-    author: {
-        type: String,
-        required: true
+    //whenever a user inserts a comment, we will track which user did that.
+    //This allows us to ensure deletions/edits to comments are only available to the users that created the comment
+    postedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 }, {
     timestamps: true
