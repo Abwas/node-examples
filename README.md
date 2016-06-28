@@ -70,3 +70,82 @@ _______
 * navigate to your database: ```mongod --dbpath=data```
 * navigate to rest-server: ```npm-start```
 * Open postman and run your post/get/put/delete requests to test
+
+#### Basic-Auth [folder]
+* An Express server to handle basic authentication
+* Set up the Express application to send signed cookies.
+* Set up the Express server to use Express sessions to track authenticated users
+
+#### Rest-Server-Passport [folder]
+* Use JSON web tokens for token-based user authentication
+* Use Passport module together with passport-local and passport-local-mongoose for setting up local authentication within your server.
+```
+npm install
+```
+
+### How to use the database
+**You need postman**
+```
+//First we need to create our users. Run two post requests:
+post: localhost:3000/users/register
+```
+To create a regular user, send raw json in the body of the request with the text:
+```
+{"username":"user", "password":"pass", "firstname":"brandon", "lastname":"morelli"}
+```
+To create an admin user, do the same:
+```
+{"username":"Admin", "password":"pass", "firstname":"Abrandon", "lastname":"Amorelli"}
+```
+Now lets make our admin user an actual admin. Go to terminal and start mongo shell
+```
+mongo
+
+//switch to our database
+use conFusion
+
+//set to admin status
+db.users.update({username:"Admin"},{$set:{admin:true}});
+
+//now find all users
+db.users.find().pretty()
+```
+
+Head back to postman and login:
+post: localhost:3000/users/login
+body, raw, json: {"username":"Admin", "password":"pass"}
+
+Our token will be returned. Copy and save the token
+
+Now we can look at a list of registered users:
+get:localhost:3000/users/
+
+In the header set x-access-token to our token value from the previous step.
+This will return our array of users. 
+
+Still logged in as an admin, we can post dishes to the database:
+post: localhost:3000/dishes/
+```
+{
+"name": "dishName",
+"image": "dishURL",
+"category": "dishCat",
+"label": "dishLabel",
+"price": "1.99",
+"description": "dish description paragraph lorem ipsum"
+}
+```
+
+Now, we can login as an ordinary user and comment on a dish:
+1. Login as normal user
+2. Use token to do a get: localhost:3000/dishes/
+3. Copy a dishId you want to comment on
+4. post: localhost:3000/dishes/**dishID**/comments
+```
+{
+    "rating": 5,
+    "comment": "anything you want to say goes here"
+}
+```
+
+5. Now if we do a get: localhost:3000/dishes/ our comment will be displayed AND it will show all user information about the user that created that comment
