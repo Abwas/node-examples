@@ -55,9 +55,7 @@ _______
 * navigate to mongodb folder and run ```mongod --dbpath=data```
 * navigate to node-mongodb folder and run ```node simpleserver```
 
---------
 #### Rest-Server [folder]
-**This folder is the production folder and puts all of our learning together**
 * Integrated the REST API server based on the Express framework that we implemented earlier, together with the Mongoose schema and models that we developed to create a full-fledged REST API server
 * To build this we started by scaffolding out an Express application using ```express rest-server```
 * We then added in our ```app.js``` file from the node-express-gen folder.
@@ -76,7 +74,10 @@ _______
 * Set up the Express application to send signed cookies.
 * Set up the Express server to use Express sessions to track authenticated users
 
+------
+
 #### Rest-Server-Passport [folder]
+**This folder is the production folder and puts all of our learning together**
 * Use JSON web tokens for token-based user authentication
 * Use Passport module together with passport-local and passport-local-mongoose for setting up local authentication within your server.
 ```
