@@ -150,3 +150,12 @@ Now, we can login as an ordinary user and comment on a dish:
 ```
 
 5. Now if we do a get: localhost:3000/dishes/ our comment will be displayed AND it will show all user information about the user that created that comment
+
+### How to run the HTTPS Server:
+* First navigate to /bin and create your private key and certificate
+```
+openssl genrsa 1024 > private.key
+openssl req -new -key private.key -out cert.csr
+openssl x509 -req -in cert.csr -signkey private.key -out certificate.pem
+```
+* Then run ``` npm start ``` and navigate to ``` https://localhost:3443 ```
