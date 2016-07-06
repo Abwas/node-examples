@@ -27,6 +27,15 @@ var leaderRouter = require('./routes/leaderRouter');
 
 var app = express();
 
+//intercept all incoming traffic and make it SECURE
+// route '*' means apply to all incoming traffic
+app.all('*', function(req,res,next) {
+    if (req.secure) { //if request is secure, return next
+        return next();
+    };
+    res.redirect('https://'+req.hostname+':'+app.get('secPort')+req.url); //else, redirect to the https version
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
