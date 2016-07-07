@@ -6,7 +6,8 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     mongoose = require('mongoose'),
     passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy;
+    authenticate = require('./authenticalte');
+
 
 var config = require('./config');
 //pull url from config.js
@@ -48,11 +49,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 //passport config
-var User = require('./models/user'); //model to track and store users
 app.use(passport.initialize()); //initialize passport
-passport.use(new LocalStrategy(User.authenticate())); //passport local methods
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
