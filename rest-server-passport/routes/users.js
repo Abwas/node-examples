@@ -91,5 +91,41 @@ router.get('/logout', function(req,res) {
     //***should also destroy the token here. Needs to be added in***
 });
 
+//***FACEBOOK AUTH ROUTES***
+
+//if user requests /facebook, call passport.authenticate with the facebook strategy
+//this will result in user being sent to fb for authentication
+router.get('/facebook', passport.authenticate('facebook'), function(req,res){});
+
+//sets up our callback URL that we specified in the config.js file
+router.get('/facebook/callback', function(req,res,next){
+    //inside the above callback function, we call passport.auth with the facebook strategy
+    passport.authenticate('facebook', function(err,user,info){
+        //the above callback gets user info if successful, otherwise, an error
+        if (err){ //check for error
+            return next(err);
+        }
+        if(!user) { //no user error
+            return res.status(401).json({
+                err:info
+            });
+        }
+        req.logIn(user, function(err) { //otherwise we login the user
+            if (err) { //if login failed, raise error
+                return res.status(500).json({
+                    err: 'Could not log in user'
+                });
+            }
+            //issue a token from the server side
+            var token = Verify.getToken(user);
+            
+            res.status(200).json({
+                status: 'Login Successful!',
+                success: true,
+                token: token //return the token to the user so they can use it in the future
+            });
+        });
+    })(req, res, next);
+});
 
 module.exports = router;

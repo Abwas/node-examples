@@ -6,7 +6,7 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     mongoose = require('mongoose'),
     passport = require('passport'),
-    authenticate = require('./authenticalte');
+    authenticate = require('./authenticate');
 
 
 var config = require('./config');
