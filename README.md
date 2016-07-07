@@ -159,3 +159,8 @@ openssl req -new -key private.key -out cert.csr
 openssl x509 -req -in cert.csr -signkey private.key -out certificate.pem
 ```
 * Then run ``` npm start ``` and navigate to ``` https://localhost:3443 ```
+
+### How to use Facebook OAuth Support:
+* Go to ``` https://developers.facebook.com/apps/ ``` and register your application. Be sure to add your callback url ``` https://localhost:3443/users/facebook/callback ``` under the settings tab.
+* Update your ```config.js``` file with your new ```clientID```, and ```clientSecret```
+* Now you should be able to login via ``` https://localhost:3443/users/facebook ```
